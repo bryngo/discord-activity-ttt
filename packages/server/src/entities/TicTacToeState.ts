@@ -1,13 +1,24 @@
-import { Schema, MapSchema, type } from '@colyseus/schema';
+import { Schema, MapSchema, type, ArraySchema } from '@colyseus/schema';
 import { TPlayerOptions, Player } from './Player';
 import { Square } from './Square';
+import { Cell } from '../shared/TicTacToeTypes'
 
-export interface IState {
-  roomName: string;
-  channelId: string;
+// We have an interface here so that the schema is shareable with the client
+// side code
+export interface ITicTacToeState {
+  players: MapSchema<Player>
+  roomName: string
+  channelId: string
+  player1: string
+  player2: string
+  turn: number
+  activePlayer: number
+  board: MapSchema<Square> // DEPRECATED
+
+  gameBoard: ArraySchema<number>
 }
 
-export class State extends Schema {
+export class TicTacToeState extends Schema implements ITicTacToeState {
   @type({ map: Player })
   players = new MapSchema<Player>();
 
@@ -26,36 +37,34 @@ export class State extends Schema {
   @type('number')
   public turn: number;
 
+  @type('number')
+  public activePlayer = 0
+
   @type({ map: Square })
   board = new MapSchema<Square>()
+
+  @type(['number'])
+  gameBoard: ArraySchema<number>;
 
   serverAttribute = 'this attribute wont be sent to the client-side';
 
   // Init
-  constructor(attributes: IState) {
+  constructor(attributes: ITicTacToeState) {
     super();
     this.roomName = attributes.roomName;
     this.channelId = attributes.channelId;
     this.player1 = ''
     this.player2 = ''
     this.turn = 0
+    this.gameBoard = new ArraySchema(
+      Cell.Empty, Cell.Empty, Cell.Empty,
+      Cell.Empty, Cell.Empty, Cell.Empty,
+      Cell.Empty, Cell.Empty, Cell.Empty,
+    )
   }
 
   private _getPlayer(sessionId: string): Player | undefined {
     return Array.from(this.players.values()).find((p) => p.sessionId === sessionId);
-  }
-
-  createPlayer(sessionId: string, playerOptions: TPlayerOptions) {
-    const existingPlayer = Array.from(this.players.values()).find((p) => p.sessionId === sessionId);
-    if (existingPlayer == null) {
-      this.players.set(playerOptions.userId, new Player({ ...playerOptions, sessionId }));
-    }
-
-    if (this.player1 == '') {
-      this.player1 = sessionId
-    } else if (this.player2 == '') {
-      this.player2 = sessionId
-    }
   }
 
   removePlayer(sessionId: string) {
@@ -79,8 +88,8 @@ export class State extends Schema {
     }
   }
 
-  updateBoard(id: number, value: string, user_id: string) {
-    this.board.set(id.toString(), new Square({ value, user_id }))
+  updateBoard(id: number, value: string, userId: string) {
+    this.board.set(id.toString(), new Square({ value, userId, isWinner: "", icon: "" }))
   }
 
 }

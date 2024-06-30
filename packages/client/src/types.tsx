@@ -1,9 +1,9 @@
-import type {CommandResponse} from '@discord/embedded-app-sdk';
-import {Client, Room} from 'colyseus.js';
-import {State} from '../../server/src/entities/State';
+import type { CommandResponse } from '@discord/embedded-app-sdk';
+import { Client, Room } from 'colyseus.js';
+import { ITicTacToeState } from '../../server/src/entities/TicTacToeState';
 
 export interface IColyseus {
-  room: Room<State>;
+  room: Room<ITicTacToeState>;
   client: Client;
 }
 export type TAuthenticatedContext = CommandResponse<'authenticate'> & {

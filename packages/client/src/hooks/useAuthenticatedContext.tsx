@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Client, Room } from 'colyseus.js';
 
-import { State } from '../../../server/src/entities/State';
+import { ITicTacToeState } from '../../../server/src/entities/TicTacToeState';
 import { GAME_NAME } from '../../../server/src/shared/Constants';
 
 import { discordSdk } from '../discordSdk';
@@ -153,13 +153,15 @@ function useAuthenticatedContextSetup() {
       });
 
       // The second argument has to include for the room as well as the current player
-      const newRoom = await client.joinOrCreate<State>(GAME_NAME, {
+      const newRoom = await client.joinOrCreate<ITicTacToeState>(GAME_NAME, {
         channelId: discordSdk.channelId,
         roomName,
         userId: newAuth.user.id,
         name,
         avatarUri,
       });
+
+      console.log(newRoom)
 
       // Finally, we construct our authenticatedContext object to be consumed throughout the app
       setAuth({ ...newAuth, guildMember, client, room: newRoom });

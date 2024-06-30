@@ -4,11 +4,12 @@ import IconO from "@assets/icon-o.svg";
 import IconX from "@assets/icon-x.svg";
 import IconOOutline from "@assets/icon-o-outline.svg";
 import IconXOutline from "@assets/icon-x-outline.svg";
-import { GridGame, TGameBoardBlock } from "@helpers/gridGame";
+import { ISquareState } from "../../../server/src/entities/Square";
+
 
 interface ObjectCheckWinner {
-    gameBoard: TGameBoardBlock[];
-    setGameBoard: React.Dispatch<React.SetStateAction<TGameBoardBlock[]>>;
+    gameBoard: ISquareState[];
+    setGameBoard: React.Dispatch<React.SetStateAction<ISquareState[]>>;
 }
 
 export function useWin() {
@@ -55,10 +56,10 @@ export function useWin() {
     };
 
     const newTickTacToeColor = (
-        ticTacToe: GridGame[],
+        ticTacToe: ISquareState[],
         pickPlayer: string,
         position: number[] = []
-    ): GridGame[] => {
+    ): ISquareState[] => {
         return ticTacToe.map((item, id) => {
             if (position.includes(id)) {
                 return {
@@ -81,8 +82,8 @@ export function useWin() {
     const win = (
         invertTurn: string,
         filterTurn: number[],
-        gameBoard: TGameBoardBlock[],
-        setGameBoard: React.Dispatch<React.SetStateAction<TGameBoardBlock[]>>
+        gameBoard: ISquareState[],
+        setGameBoard: React.Dispatch<React.SetStateAction<ISquareState[]>>
     ): string => {
         if (filterTurn.length >= 3) {
             if (

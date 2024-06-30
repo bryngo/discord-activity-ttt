@@ -4,6 +4,7 @@ import { Player as PlayerState } from '../../../server/src/entities/Player';
 
 import { useAuthenticatedContext } from '@hooks/useAuthenticatedContext';
 import { discordSdk } from '../discordSdk';
+import { useGameBoard } from './useTicTacToe';
 
 const PlayersContext = React.createContext<PlayerState[]>([]);
 
@@ -22,9 +23,10 @@ export function usePlayers() {
  * One improvement worth considering is using a map instead of an array
  */
 function usePlayersContextSetup() {
-  const [players, setPlayers] = React.useState<PlayerState[]>([]);
+  const [players, setPlayers] = React.useState<PlayerState[]>([])
 
-  const authenticatedContext = useAuthenticatedContext();
+  const authenticatedContext = useAuthenticatedContext()
+  const gameBoardContext = useGameBoard()
 
   React.useEffect(() => {
     try {
@@ -49,6 +51,10 @@ function usePlayersContextSetup() {
         player.listen('sessionId', (value) => handlePropertyChange('sessionId', value));
         player.listen('talking', (value) => handlePropertyChange('talking', value));
         player.listen('userId', (value) => handlePropertyChange('userId', value));
+
+        authenticatedContext.room.state.board.forEach((v, k) => {
+          gameBoardContext.gameBoard[parseInt(k)] = v
+        })
       });
 
       authenticatedContext.room.state.players.onRemove((player, _key) => {
@@ -58,6 +64,9 @@ function usePlayersContextSetup() {
       authenticatedContext.room.onLeave((code) => {
         console.log("You've been disconnected.", code);
       });
+
+      // gameBoardContext.gameBoard = authenticatedContext.room.state.board
+
     } catch (e) {
       console.error("Couldn't connect:", e);
     }

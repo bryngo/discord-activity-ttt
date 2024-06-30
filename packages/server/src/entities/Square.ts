@@ -1,24 +1,30 @@
 import { Schema, type } from '@colyseus/schema'
 
-export interface SquareState {
+export interface ISquareState {
     value: string // "X" or "O"
-    user_id: string // we keep track of who played this square so we don't apply the same move again when communicating back to clients
+    isWinner: string
+    icon: string
+    userId: string // we keep track of who played this square so we don't apply the same move again when communicating back to clients
 }
 
-export class Square extends Schema {
+export class Square extends Schema implements ISquareState {
     @type('string')
     public value: string
 
     @type('boolean')
-    public isWinner: boolean
+    public isWinner: string
 
     @type('string')
-    public user_id: string
+    public icon: string
 
-    constructor(attributes: SquareState) {
+    @type('string')
+    public userId: string
+
+    constructor(attributes: ISquareState) {
         super()
         this.value = attributes.value
-        this.user_id = attributes.user_id
-        this.isWinner = false
+        this.userId = attributes.userId
+        this.icon = attributes.icon
+        this.isWinner = attributes.isWinner
     }
 }

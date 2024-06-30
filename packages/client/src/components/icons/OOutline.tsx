@@ -1,9 +1,9 @@
-export function XOutline({
-    state,
+export function OOutline({
+    state = false,
     width = 32,
     height = 32,
 }: {
-    state: boolean;
+    state?: boolean;
     width?: number;
     height?: number;
 }) {
